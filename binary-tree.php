@@ -217,7 +217,14 @@ $array[1009]['aff_id'] = 1007;
 $array[1011]['aff_id'] = 1002;
 $array[1012]['aff_id'] = 1002;
 $array[1013]['aff_id'] = 1005;
-//prx($array);
+$array[1014]['aff_id'] = 1005;
+$array[1015]['aff_id'] = 1008;
+$array[1016]['aff_id'] = 1013;
+$array[1017]['aff_id'] = 1015;
+$array[1018]['aff_id'] = 1016;
+pr("Original Array");
+pr($array);
+pr("Binary Tree formatted Array");
 $i = 1;
 foreach ($array as $k => $v) {
 	// If affiliate id is 0, then create the root node
@@ -253,11 +260,12 @@ foreach ($array as $k => $v) {
 	//pr($v);
 	find_parent($v, $na);
 	if ($i == 11) {
-		pr(1);
-		prx($na);
+		//pr(1);
+		//prx($na);
 	}
 	$i++;
 }
+prx($na);
 
 function find_parent($v, &$na) {
 	if (!is_array($na)) {
@@ -267,9 +275,9 @@ function find_parent($v, &$na) {
 		if ($_v['id'] == $v['aff_id']) {
 			//pr($v);
 			//pr($na);
-			if(!fit_node_under_parent($v, $na[$_k])) {
+			if (!fit_node_under_parent($v, $na[$_k])) {
 				//prx($na[$_k]);
-				fit_node_under_parent_with_kids($v, $na[$_k]);
+				fit_node_under_parent_2($v, $na[$_k]);
 			}
 			return;
 		}
@@ -292,7 +300,6 @@ function fit_node_under_parent($v, &$parent) {
 			//pr("The ID is L or R, it's : $_k");
 			//pr($parent);
 			//pr($_v);
-			
 			// If Value is 0, then save $v in whatever it is (L or R)
 			// But if it is an array, then check 
 			if (!$_v) {
@@ -366,88 +373,141 @@ function fit_node_under_parent($v, &$parent) {
 	}
 	return false;
 }
-function fit_node_under_parent_with_kids($v, &$parent, &$kids = array()) {
-	if (!count($kids)) {
-		
-	}
-	
-	  pr('Parent start');
-	  pr($v);
-	  pr($parent);
-	  prx('Parent End');
-	 
-	foreach ($parent as $_k => $_v) {
-		if (in_array($_k, array('L', 'R'))) {
-			//pr($v);
-			//pr($parent);
-			//pr($_v);
-			
-			// If Value is 0, then save $v in whatever it is (L or R)
-			// But if it is an array, then check 
-			if (!$_v) {
-				//pr($v);
-				//pr($_k);
-				//pr($parent);
 
-				$parent[$_k] = array(
-					'id' => $v['id'],
-					'level' => $parent['level'] + 1,
-					'parent' => $v['aff_id'],
-					'L' => 0,
-					'R' => 0
-				);
-				//pr($parent);
-				return true;
-			} else {
-				//pr($parent);
-				if (!$parent['R']) {
-					//pr('Should be here!');
-					$parent['R'] = array(
-						'id' => $v['id'],
-						'level' => $parent['level'] + 1,
-						'parent' => $v['aff_id'],
-						'L' => 0,
-						'R' => 0
-					);
-					//pr($parent);
-					return true;
-				} else {
-					
-				}
-			}
-			//pr($_k);
-			if (isset($_v['L']) && !$_v['L']) {
-				//pr($v);
-				//pr($_v);
-				if (isset($parent[$_k]['L'])) {
-					$parent[$_k]['L'] = array(
-						'id' => $v['id'],
-						'level' => $_v['level'] + 1,
-						'parent' => $_v['id'],
-						'L' => 0,
-						'R' => 0
-					);
-				}
-				return true;
-			} else {
-				if (isset($_v['R']) && !($_v['R'])) {
-					//pr($v);
-					if (isset($parent[$_k]['R'])) {
-						$parent[$_k]['R'] = array(
-							'id' => $v['id'],
-							'level' => $_v['level'] + 1,
-							'parent' => $_v['id'],
-							'L' => 0,
-							'R' => 0
-						);
-					}
-					return true;
-				}
-			}
-			//return false;
+function fit_node_under_parent_2($v, &$parent) {
+	//pr($v);
+	//pr($parent);
+
+	if (is_array($parent)) {
+		if (!($parent['L'])) {
+			$parent['L'] = array(
+				'id' => $v['id'],
+				'level' => ($parent['level'] + 1),
+				'parent' => $parent['L']['id'],
+				'L' => 0,
+				'R' => 0
+			);
+			return true;
+		} else if (!($parent['R'])) {
+			$parent['R'] = array(
+				'id' => $v['id'],
+				'level' => ($parent['level'] + 1),
+				'parent' => $parent['L']['id'],
+				'L' => 0,
+				'R' => 0
+			);
+			return true;
 		} else {
-			//pr("The ID is not L or R, it's $_k");
+			//pr("{$parent['level']}");
+			if(!find_by_level($parent['L'], $parent['level'], $v)) {
+				find_by_level($parent['R'], $parent['level'], $v);
+			}
 		}
 	}
-	return false;
+	/*
+	foreach ($parent as $_k => $_v) {
+		if (in_array($_k, array('L', 'R'))) {
+			$counter++;
+			if (!($_v)) {
+				$parent[$_k] = array('id' => $v['id'], 'level' => ($parent['level'] + 1), 'parent' => $parent[$_k]['id'], 'L' => 0, 'R' => 0);
+				return;
+			}
+			if ($counter) {
+				find_by_level($parent[$_k], ($parent['level'] + 1), $v);
+			}
+			if ($counter == 2) {
+				$counter = 0;
+			}
+		}
+	}
+	*/
+	//prx($parent);
 }
+
+function find_by_level(&$parent, $level, $v) {
+	//pr("level wise: $level");
+	//pr($parent);
+	if (is_array($parent)) {
+		if (!($parent['L'])) {
+			$parent['L'] = array(
+				'id' => $v['id'],
+				'level' => ($parent['level'] + 1),
+				'parent' => $parent['L']['id'],
+				'L' => 0,
+				'R' => 0
+			);
+			return true;
+		} else if (!($parent['R'])) {
+			$parent['R'] = array(
+				'id' => $v['id'],
+				'level' => ($parent['level'] + 1),
+				'parent' => $parent['R']['id'],
+				'L' => 0,
+				'R' => 0
+			);
+			return true;
+		} else {
+			if(!find_by_level($parent['L'], $parent['level'], $v)) {
+				find_by_level($parent['R'], $parent['level'], $v);
+			}
+		}
+	}
+}
+
+/*
+function fit_node_under_parent_with_kids($v, &$parent) {
+
+	$_values = array();
+
+	pr('Parent start');
+	pr($v);
+	pr($parent);
+	pr('Parent End');
+
+	foreach ($parent as $_k => $_v) {
+		if (in_array($_k, array('L', 'R'))) {
+			if (!($_v)) {
+				$parent[$_k] = array('id' => $v['id'], 'level' => $_v['level'], 'parent' => $_v['id'], 'L' => 0, 'R' => 0);
+				pr('DONE');
+				prx($parent);
+				return;
+			} else {
+				pr($parent['id']);
+				pr($_k);
+				if (!$_v['L']) {
+					pr($_v);
+				} else {
+					$_values[] = $parent[$_k]['L'];
+				}
+				if (!$_v['R']) {
+					pr($_v);
+				} else {
+					$_values[] = $parent[$_k]['R'];
+				}
+				
+			}
+		}
+		if (is_numeric($_k)) {
+			if (!$_v['L']) {
+				$parent[$_k] = array('id' => $v['id'], 'level' => $_v['level'], 'parent' => $_v['id'], 'L' => 0, 'R' => 0);
+				pr('DONE');
+				prx($parent);
+				//pr($_v);
+			} else {
+				$_values[] = $parent[$_k]['L'];
+			}
+			if (!$_v['R']) {
+				pr($_v);
+			} else {
+				$_values[] = $parent[$_k]['R'];
+			}
+		}
+	}
+	//prx($_values);
+	fit_node_under_parent_with_kids($v, $_values);
+	//foreach ($_values as $__k => $__v) {
+		//fit_node_under_parent($v, $__v);
+	//}
+	//return false;
+}
+*/
