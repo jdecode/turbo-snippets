@@ -7,6 +7,7 @@ class cfunctions {
 	 * @var boolean Variable that defines if the data is POST or not
 	 */
 	private $is_post = false;
+	private $httpauth = array('username' => 'jdecode', 'password' => API_KEY);
 
 	public function __construct() {
 		
@@ -84,8 +85,12 @@ class cfunctions {
 		$header[] = "Keep-Alive:timeout=5, max=100";
 		$header[] = "Accept-Charset:ISO-8859-1,utf-8;q=0.7,*;q=0.3";
 		$header[] = "Accept-Language:es-ES,es;q=0.8";
-		$header[] = "Authorization: ";
+		//$header[] = "Authorization: ";
 		$header[] = "Pragma: ";
+		if (!empty($this->httpauth)) {
+			$header[] = 'Authorization: Basic ' . base64_encode("{$this->httpauth['username']}:{$this->httpauth['password']}");
+		}
+
 
 		return $header;
 	}
@@ -97,6 +102,29 @@ class cfunctions {
 	 */
 	public function _create_json($array = null) {
 		return json_encode($array);
+	}
+
+	function get_lists() {
+		//$url = 'https://us9.api.mailchimp.com/3.0/lists/';
+		$url = 'https://us9.api.mailchimp.com/3.0/lists/53d8981a54/members/';
+		return $this->_get_curl_data($url);
+	}
+
+	function get_campaigns() {
+		//$url = 'https://us9.api.mailchimp.com/3.0/lists/';
+		$url = 'https://us9.api.mailchimp.com/3.0/campaigns/';
+		return $this->_get_curl_data($url);
+	}
+
+	function add_member($data) {
+		//$url = 'https://us9.api.mailchimp.com/3.0/lists/';
+		$url = 'https://us9.api.mailchimp.com/3.0/lists/53d8981a54/members/';
+		return $this->_get_curl_data($url, $data);
+	}
+	
+	function about_me() {
+		$url = 'https://us9.api.mailchimp.com/3.0/';
+		return $this->_get_curl_data($url);
 	}
 
 }
