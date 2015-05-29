@@ -50,6 +50,12 @@ function pr($a) {
 	echo '</pre>';
 }
 
+function vd($a) {
+	echo '<pre>';
+	var_dump($a);
+	echo '</pre>';
+}
+
 function prx($a) {
 	pr($a);
 	die;
@@ -87,22 +93,24 @@ $_current_parent = 0;
 $_current_level = 0;
 $break = 0;
 
-
-$array[1007]['aff_id'] = 1005;
-$array[1008]['aff_id'] = 1007;
-$array[1009]['aff_id'] = 1007;
-$array[1011]['aff_id'] = 1002;
-$array[1012]['aff_id'] = 1002;
-$array[1013]['aff_id'] = 1005;
-$array[1014]['aff_id'] = 1005;
-$array[1015]['aff_id'] = 1008;
-$array[1016]['aff_id'] = 1013;
-$array[1017]['aff_id'] = 1015;
-$array[1018]['aff_id'] = 1016;
+/*
+  $array[1007]['aff_id'] = 1005;
+  $array[1008]['aff_id'] = 1007;
+  $array[1009]['aff_id'] = 1007;
+  $array[1011]['aff_id'] = 1002;
+  $array[1012]['aff_id'] = 1002;
+  $array[1013]['aff_id'] = 1005;
+  $array[1014]['aff_id'] = 1005;
+  $array[1015]['aff_id'] = 1008;
+  $array[1016]['aff_id'] = 1013;
+  $array[1017]['aff_id'] = 1015;
+  $array[1018]['aff_id'] = 1016;
+ */
+//$array[1008]['aff_id'] = 1001;
 pr("Original Array");
 pr($array);
 pr("Binary Tree formatted Array");
-$i = 1;
+$breaker = 1;
 foreach ($array as $k => $v) {
 	// If affiliate id is 0, then create the root node
 	if (!$v['aff_id']) {
@@ -112,35 +120,38 @@ foreach ($array as $k => $v) {
 		$_root_node = 0;
 		continue;
 	}
-	if (!$na[0]['L']) {
-		// Still i = 1
-		$na[0]['L'] = array(
-			'id' => $v['id'],
-			'level' => 1,
-			'parent' => $v['aff_id'],
-			'L' => 0,
-			'R' => 0
-		);
-		continue;
-	}
-	if (!$na[0]['R']) {
-		// Still i = 1
-		$na[0]['R'] = array(
-			'id' => $v['id'],
-			'level' => 1,
-			'parent' => $v['aff_id'],
-			'L' => 0,
-			'R' => 0
-		);
-		continue;
-	}
+	/*
+	  if (!$na[0]['L']) {
+	  // Still i = 1
+	  $na[0]['L'] = array(
+	  'id' => $v['id'],
+	  'level' => 1,
+	  'parent' => $v['aff_id'],
+	  'L' => 0,
+	  'R' => 0
+	  );
+	  continue;
+	  }
+	  if (!$na[0]['R']) {
+	  // Still i = 1
+	  $na[0]['R'] = array(
+	  'id' => $v['id'],
+	  'level' => 1,
+	  'parent' => $v['aff_id'],
+	  'L' => 0,
+	  'R' => 0
+	  );
+	  continue;
+	  }
+	 */
 	//pr($v);
 	find_parent($v, $na);
-	if ($i == 11) {
-		//pr(1);
-		//prx($na);
+	if ($breaker == 7) {
+		pr(1);
+		//pr($v);
+		prx($na);
 	}
-	$i++;
+	$breaker++;
 }
 prx($na);
 
@@ -152,9 +163,38 @@ function find_parent($v, &$na) {
 		if ($_v['id'] == $v['aff_id']) {
 			//pr($v);
 			//pr($na);
+			//pr($na[$_k]);
 			if (!fit_node_under_parent($v, $na[$_k])) {
-				//prx($na[$_k]);
-				fit_node_under_parent_2($v, $na[$_k]);
+				//pr($na[$_k]);
+				/*
+				  if (!$na[$_k]['L']) {
+				  $na[$_k]['L'] = array(
+				  'id' => $v['id'],
+				  'level' => $na[$_k]['level'] + 1,
+				  'parent' => $v['aff_id'],
+				  'L' => 0,
+				  'R' => 0
+				  );
+				  } else if (!$na[$_k]['R']) {
+				  $na[$_k]['R'] = array(
+				  'id' => $v['id'],
+				  'level' => $na[$_k]['level'] + 1,
+				  'parent' => $v['aff_id'],
+				  'L' => 0,
+				  'R' => 0
+				  );
+				  } else {
+				  $new_array = array();
+				  foreach ($na[$_k] as $key => $value) {
+				  if(in_array($key, array('L', 'R'))) {
+				  $new_array[] = $value;
+				  }
+				  }
+				  }
+				 */
+				//prx($new_array);
+				//fit_node_under_parent_2($v, $na[$_k]);
+				fit_node_under_parent_deep($v, $na[$_k]);
 			}
 			return;
 		}
@@ -251,66 +291,73 @@ function fit_node_under_parent($v, &$parent) {
 	return false;
 }
 
-function fit_node_under_parent_2($v, &$parent) {
+function fit_node_under_parent_deep($v, &$parent) {
+	//pr(3);
 	//pr($v);
-	//pr($parent);
-
+	//pr('INIT');
+	pr('parent');
+	pr($parent);
+	$_found_vacant = false;
+	$_next_array = array();
 	if (is_array($parent)) {
-		if (!($parent['L'])) {
-			$parent['L'] = array(
-				'id' => $v['id'],
-				'level' => ($parent['level'] + 1),
-				'parent' => $parent['L']['id'],
-				'L' => 0,
-				'R' => 0
-			);
-			return true;
-		} else if (!($parent['R'])) {
-			$parent['R'] = array(
-				'id' => $v['id'],
-				'level' => ($parent['level'] + 1),
-				'parent' => $parent['L']['id'],
-				'L' => 0,
-				'R' => 0
-			);
-			return true;
-		} else {
-			//pr("{$parent['level']}");
-			if(!find_by_level($parent['L'], $parent['level'], $v)) {
-				find_by_level($parent['R'], $parent['level'], $v);
+		foreach ($parent as $_k => $_v) {
+			if (!in_array($_k, array('L', 'R'))) {
+				continue;
+			}
+			//vd(!($_v));
+			//pr($_v);
+			//pr($_k);
+			if ($_k == 'L' && !($_v)) {
+				$_found_vacant = true;
+				prx('L');
+				$parent['L'] = array(
+					'id' => $v['id'],
+					'level' => ($_v['level'] + 1),
+					'parent' => $_v['id'],
+					'L' => 0,
+					'R' => 0
+				);
+				return true;
+			} else if ($_k == 'R' && !($_v)) {
+				$_found_vacant = true;
+				prx('R');
+				$parent['R'] = array(
+					'id' => $v['id'],
+					'level' => ($_v['level'] + 1),
+					'parent' => $_v['id'],
+					'L' => 0,
+					'R' => 0
+				);
+				return true;
+			} else {
+				//return false;
+			}
+		}
+		if (!$_found_vacant) {
+			foreach ($parent as $_k => $_v) {
+				if (!in_array($_k, array('L', 'R'))) {
+					continue;
+				}
+				prx($parent[$_k]);
+				if(fit_node_under_parent_deep($v, $parent[$_k])) {
+					/*
+					global $breaker;
+					global $na;
+					if($breaker == 11) {
+						pr('BULL');
+						pr($parent[$_k]);
+						pr($na);
+						pr('SHIT');
+					}
+					*/
+					break;
+				}
 			}
 		}
 	}
-	
+	//pr(2);
+	//pr('TERM');
+	//pr($parent);
 }
 
-function find_by_level(&$parent, $level, $v) {
-	//pr("level wise: $level");
-	//pr($parent);
-	if (is_array($parent)) {
-		if (!($parent['L'])) {
-			$parent['L'] = array(
-				'id' => $v['id'],
-				'level' => ($parent['level'] + 1),
-				'parent' => $parent['L']['id'],
-				'L' => 0,
-				'R' => 0
-			);
-			return true;
-		} else if (!($parent['R'])) {
-			$parent['R'] = array(
-				'id' => $v['id'],
-				'level' => ($parent['level'] + 1),
-				'parent' => $parent['R']['id'],
-				'L' => 0,
-				'R' => 0
-			);
-			return true;
-		} else {
-			if(!find_by_level($parent['L'], $parent['level'], $v)) {
-				find_by_level($parent['R'], $parent['level'], $v);
-			}
-		}
-	}
-}
 
