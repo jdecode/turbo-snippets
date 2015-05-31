@@ -4,9 +4,14 @@ class cfunctions {
 
 	/**
 	 *
-	 * @var boolean Variable that defines if the data is POST or not
+	 * @var boolean | Variable that defines if the data is POST or not
 	 */
 	private $is_post = false;
+
+	/**
+	 *
+	 * @var array  | Array containing basic authentication variables
+	 */
 	private $httpauth = array('username' => 'jdecode', 'password' => API_KEY);
 
 	public function __construct() {
